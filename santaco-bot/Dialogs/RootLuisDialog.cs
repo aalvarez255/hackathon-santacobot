@@ -19,6 +19,7 @@
         [LuisIntent("None")]
         public async Task None(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
+            lastQuery = "";
             string[] notUnderstandingInterjections = new string[] {
                 "A ver... no te estoy entendiendo... Me lo podrias volver a repetir? Despacito, que me entere.",
                 "Ups... No te entiendo eh. Intentalo otra vez.",
@@ -67,7 +68,7 @@
             lastQuery = gifQuery;
 
             string gifUrl = await client.GetGifUrl(gifQuery);
-            string response = $"{incoming[incomingIndex]} {gifUrl}";
+            string response = $"{incoming[incomingIndex]} {gifUrl} (un gif de '{gifQuery}')";
             await context.PostAsync(response);
 
             context.Wait(this.MessageReceived);
@@ -76,6 +77,7 @@
         [LuisIntent("Ayuda")]
         public async Task Help(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
+            lastQuery = "";
             string message = $"¡Hola! Soy el santaco-bot y he venido directito desde la periferia para surtirte con los mejores gifs." +
                 $" De momento solo hablo castellano (¿no te he dicho que soy de Santaco?) " +         
                 $" Soy todavia muy joven pero te puedo saludar, " +
@@ -90,6 +92,7 @@
         [LuisIntent("Saludos")]
         public async Task Hello(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
+            lastQuery = "";
             string[] salutations = new string[] {
                 "¡Buenos dias!",
                 "¡¿Qué pasa niño?!",
@@ -112,6 +115,20 @@
         [LuisIntent("Dame otro")]
         public async Task Other(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
+            string response = "";
+            if (string.IsNullOrEmpty(lastQuery))
+            {
+                string[] vacilate = new string[] {
+                "Pero si no me has pedido nada... No me vaciles",
+                "¿Otro que? Si es la primera vez que me dices algo.",
+                "¿Perdon? Me hablas a mi? ¡Todavía no me has pedido ningun gif!",
+                "Anda no me vaciles, que aun no has dicho nada.",
+                };
+
+                int vacilateIndex = new Random().Next(1, vacilate.Length);
+                response = $"{vacilate[vacilateIndex]}";
+            }
+
             string[] another = new string[] {
                 "¿No te ha gustado? Toma otro",
                 "Errar es humano y de bots también... Supongo. Toma:",
@@ -131,7 +148,7 @@
 
             TenorClient client = new TenorClient();
             string gifUrl = await client.GetGifUrl(lastQuery);
-            string response = $"{another[anotherIndex]} {gifUrl}";
+            response = $"{another[anotherIndex]} {gifUrl}";
             await context.PostAsync(response);
 
             context.Wait(this.MessageReceived);
