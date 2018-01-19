@@ -128,8 +128,9 @@
                 int vacilateIndex = new Random().Next(1, vacilate.Length);
                 response = $"{vacilate[vacilateIndex]}";
             }
-
-            string[] another = new string[] {
+            else
+            {
+                string[] another = new string[] {
                 "¿No te ha gustado? Toma otro",
                 "Errar es humano y de bots también... Supongo. Toma:",
                 "Otro, otro!",
@@ -144,13 +145,13 @@
                 "Ahí tienes otro:",
                 };
 
-            int anotherIndex = new Random().Next(1, another.Length);
-
-            TenorClient client = new TenorClient();
-            string gifUrl = await client.GetGifUrl(lastQuery);
-            response = $"{another[anotherIndex]} {gifUrl}";
+                int anotherIndex = new Random().Next(1, another.Length);
+                TenorClient client = new TenorClient();
+                string gifUrl = await client.GetGifUrl(lastQuery);
+                response = $"{another[anotherIndex]} {gifUrl}";
+            } 
+            
             await context.PostAsync(response);
-
             context.Wait(this.MessageReceived);
         }
 
