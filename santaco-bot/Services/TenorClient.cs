@@ -10,16 +10,16 @@ namespace santaco_bot.Services
 {
     public class TenorClient
     {
-        private string _apiKey = "71QAPD4U4KJ7";
-        private string _locale = "es-ES";
+        private string _apiKey = "JDSdwy2UK3xpxFWQmCdjgz7UhuePgTow";
+        private string _locale = "es";
         private int _numberOfGifs = 50;
-        private string _tenorSearchUrl = "https://api.tenor.com/v1/search?q=${0}&key={1}&limit={2}&locale={3}";
-        private string _tenorTrendingUrl = "https://api.tenor.com/v1/trending?key={0}&limit={1}";
+        private string _tenorSearchUrl = "https://api.giphy.com/v1/gifs/search?api_key={0}&limit={1}&q={2}&lang={3}";
+        private string _tenorTrendingUrl = "https://api.giphy.com/v1/gifs/trending?key={0}&limit={1}";
 
         public async Task<string> GetGifUrl(string gifType)
         {
             gifType = HttpUtility.UrlEncode(gifType);
-            string url = string.Format(_tenorSearchUrl, gifType, _apiKey, _numberOfGifs, _locale);
+            string url = string.Format(_tenorSearchUrl, _apiKey, _numberOfGifs, gifType, _locale);
             return await GetRequest(url);
         }
 
@@ -39,12 +39,9 @@ namespace santaco_bot.Services
 
                 int randomGifIndex = GetRandomInt();
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                JArray resultsArray = JObject.Parse(jsonResponse)["results"] as JArray;
-                JObject resultJsob = resultsArray.Children().ElementAt(randomGifIndex) as JObject;
-                JArray mediaArray = resultJsob["media"] as JArray;
-                JObject firstMedia = mediaArray.Children().First() as JObject;
-                JObject gifMedia = firstMedia["gif"] as JObject;
-                string gifUrl = gifMedia.GetValue("url").ToString();
+                JArray resultsArray = JObject.Parse(jsonResponse)["data"] as JArray;
+                JObject resultJsob = resultsArray.Children().ElementAt(randomGifIndex) as JObject;      
+                string gifUrl = resultJsob.GetValue("embed_url").ToString();
                 return gifUrl;
             }
         }
