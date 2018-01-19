@@ -18,6 +18,7 @@ namespace santaco_bot.Services
 
         public async Task<string> GetGifUrl(string gifType)
         {
+            gifType = HttpUtility.UrlEncode(gifType);
             string url = string.Format(_tenorSearchUrl, gifType, _apiKey, _numberOfGifs, _locale);
             return await GetRequest(url);
         }
