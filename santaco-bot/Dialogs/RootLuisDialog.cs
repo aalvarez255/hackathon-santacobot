@@ -15,9 +15,25 @@
         [LuisIntent("None")]
         public async Task None(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
-            string message = $"Entered intent none";
+            string[] notUnderstandingInterjections = new string[] {
+                "A ver... no te estoy entendiendo... Me lo podrias volver a repetir? Despacito, que me entere.",
+                "Ups... No te entiendo eh. Intentalo otra vez.",
+                "Sé que soy un poquito pesadito pero es que no sé lo que me dices. Repite anda.",
+                "Eh... ¿Cómo dices? Non capisco amigo.",
+                };
 
-            await context.PostAsync(message);
+            string[] canAskForHelpMessages = new string[] {
+                "Si me pongo muy pesado siempre puedes pedirme ayuda.",
+                "Di 'ayuda' si no consigues que te entienda.",
+                "Recuerda que siempre puedes decir 'ayuda' si no te entiendo.",
+                "Si es necesario me puedes pedir ayuda.",
+                };
+
+            int notUnderstandingIndex = new Random().Next(1, notUnderstandingInterjections.Length);
+            int askHelpIndex = new Random().Next(1, notUnderstandingInterjections.Length);
+
+            string response = $"{notUnderstandingInterjections[notUnderstandingIndex]} {canAskForHelpMessages[askHelpIndex]}";
+            await context.PostAsync(response);
 
             context.Wait(this.MessageReceived);
         }
@@ -36,7 +52,10 @@
         [LuisIntent("Ayuda")]
         public async Task Help(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
-            string message = $"Entered intent ayuda";
+            string message = $"¡Hola! Soy el santaco-bot y he venido directito desde la periferia para surtirte con los mejores gifs." +
+                $" Soy todavia muy joven pero te puedo saludar, " +
+                $"me puedes pedir gifs y si no te entiendo pues te contesto. " +
+                $"Así las gastamos en Santaco. Pruaba a pedirme un gif diciendo algo como 'dame un gif de patatas'";
 
             await context.PostAsync(message);
 
@@ -46,9 +65,21 @@
         [LuisIntent("Saludos")]
         public async Task Hello(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
-            string message = $"Entered intent salutations";
-
-            await context.PostAsync(message);
+            string[] salutations = new string[] {
+                "¡Buenos dias!",
+                "¡¿Qué pasa niño?!",
+                "¡Hombre! Tú por aquí? Me alegro de verte",
+                "¿Qué marcha llevas?",
+                "¿Cómo va?",
+                "¿Cómo lo llevas?",
+                "¡Hombre! Hay que ver la buena cara que traes hoy!",
+                "¿Tú por aquí?",
+                "¡Eeeeei! ¡Qué ganas tenia de verte!",
+                "Aquí el santaco-bot listo para escuchar tus deseos."
+                };
+            int messageIndex = new Random().Next(1, salutations.Length);
+            string response = $"{salutations[messageIndex]}";
+            await context.PostAsync(response);
 
             context.Wait(this.MessageReceived);
         }
