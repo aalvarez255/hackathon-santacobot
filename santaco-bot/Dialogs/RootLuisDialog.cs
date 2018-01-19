@@ -1,16 +1,20 @@
 ﻿namespace LuisBot.Dialogs
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Builder.Luis;
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
+    using santaco_bot.Services;
 
     [LuisModel("1510f8cf-c0f6-41d3-97d3-ba3589ff1ffb", "7cb8ee90c4754d79b0b8d63b1343b6d3", domain: "westus.api.cognitive.microsoft.com")]
     [Serializable]
     public class RootLuisDialog : LuisDialog<object>
     {
+        private string lastQuery = "";
+
         [LuisIntent("")]
         [LuisIntent("None")]
         public async Task None(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
@@ -38,13 +42,33 @@
             context.Wait(this.MessageReceived);
         }
 
-        [LuisIntent("Pedir GIF")]
+        [LuisIntent("Tipo de GIF")]
         public async Task Search(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
-            string message = $"Entered intent pedir gif";
+            string[] incoming = new string[] {
+                "Marchando.",
+                "¿Qué te parece este?",
+                "Un gif calentito para mi interlocutor favorito:",
+                "Voilà!",
+                "¡Aquí tienes!",
+                "Ahí lo llevas:",
+                "jajajaja en serio? Venga toma",
+                "Ya estás pidiendo gifs? Qué poco te veo trabajar...",
+                "A ti no puedo decirte que no",
+                "Hmmm... Curiosa query la tuya",
+                "Hay que ver, te gustan más los gifs que a un tonto un lápiz.",
+                "Ahí va tu gif",
+                };
 
+            int incomingIndex = new Random().Next(1, incoming.Length);
 
-            await context.PostAsync(message);
+            TenorClient client = new TenorClient();
+            string gifQuery = string.Join(" ", result.Entities.Select(e => e.Entity));
+            lastQuery = gifQuery;
+
+            string gifUrl = await client.GetGifUrl(gifQuery);
+            string response = $"{incoming[incomingIndex]} {gifUrl}";
+            await context.PostAsync(response);
 
             context.Wait(this.MessageReceived);
         }
@@ -53,9 +77,10 @@
         public async Task Help(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
             string message = $"¡Hola! Soy el santaco-bot y he venido directito desde la periferia para surtirte con los mejores gifs." +
+                $" De momento solo hablo castellano (¿no te he dicho que soy de Santaco?) " +         
                 $" Soy todavia muy joven pero te puedo saludar, " +
-                $"me puedes pedir gifs y si no te entiendo pues te contesto. " +
-                $"Así las gastamos en Santaco. Pruaba a pedirme un gif diciendo algo como 'dame un gif de patatas'";
+                $"me puedes pedir gifs y si no te entiendo pues te pido educadamente que me lo repitas. " +
+                $"Así las gastamos en Santaco. Prueba a pedirme un gif diciendo algo como 'gif de patatas'";
 
             await context.PostAsync(message);
 
@@ -87,9 +112,27 @@
         [LuisIntent("Dame otro")]
         public async Task Other(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
         {
-            string message = $"Entered intent other";
+            string[] another = new string[] {
+                "¿No te ha gustado? Toma otro",
+                "Errar es humano y de bots también... Supongo. Toma:",
+                "Otro, otro!",
+                "¿No era ese? ¿Este mejor?",
+                "Ok ok... ¿Y este?",
+                "Ups...sorry. ¿Este quizás?",
+                "Te busco otro, te busco otro...",
+                "Siempre hay un gif más",
+                "Venga, ahí va otro",
+                "¿No te va? ¿Y este?",
+                "Vale, creo que este es incluso mejor:",
+                "Ahí tienes otro:",
+                };
 
-            await context.PostAsync(message);
+            int anotherIndex = new Random().Next(1, another.Length);
+
+            TenorClient client = new TenorClient();
+            string gifUrl = await client.GetGifUrl(lastQuery);
+            string response = $"{another[anotherIndex]} {gifUrl}";
+            await context.PostAsync(response);
 
             context.Wait(this.MessageReceived);
         }
