@@ -43,5 +43,25 @@
             context.Wait(this.MessageReceived);
         }
 
+        [LuisIntent("Saludos")]
+        public async Task Hello(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+        {
+            string message = $"Entered intent salutations";
+
+            await context.PostAsync(message);
+
+            context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("Dame otro")]
+        public async Task Other(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+        {
+            string message = $"Entered intent other";
+
+            await context.PostAsync(message);
+
+            context.Wait(this.MessageReceived);
+        }
+
     }
 }
